@@ -140,34 +140,22 @@ def priority_move(moves, previousDirection, maze):
 	"""
 	#1) a new square takes priority over a square you have already been on
 	#2) keep going in the same direction if you can.
-	indexes_for_new  = []
-	indexes_for_been = []
+	indexes_for_new  = [x for x in range(len(moves)) if moves[x] == new]
+	indexes_for_been = [x for x in range(len(moves)) if moves[x] == been]
 	
-	for item in range(len(moves)):
-		if moves[item] == new:
-			indexes_for_new.append(item)
-		if moves[item] == been:
-			indexes_for_been.append(item)
-
 	if indexes_for_new != []:
-		if len(indexes_for_new) == 1:
-			return indexes_for_new[0]
+		if previousDirection in indexes_for_new:
+			return previousDirection
 		else:
-			if previousDirection in indexes_for_new:
-				return previousDirection
-			else:
-				return indexes_for_new[0]
+			return indexes_for_new[0]
 
 	elif indexes_for_been != []:	
-		if len(indexes_for_been) == 1:
-			return indexes_for_been[0]
+		if previousDirection in indexes_for_been:
+		# if you hit a wall and turn around, this will ensure
+		# that you keep moving away from the wall.
+		 	return previousDirection
 		else:
-			if previousDirection in indexes_for_been:
-			# if you hit a wall and turn around, this will ensure
-			# that you keep moving away from the wall.
-				return previousDirection
-			else:
-				return indexes_for_been[0]
+			return indexes_for_been[0]
 	
 	else:
 		#this should never happen...
