@@ -81,6 +81,8 @@ def dropCrumb(position, crumb, maze):
 	
 	# strings are immutable so do some slicing
 	maze[row] = maze[row][:col] + crumb + maze[row][col+1:]
+	
+	return maze
 
 #---------------------------------------------------------------------------------
 
@@ -97,18 +99,17 @@ def move(position, direction, maze):
 	newRow,newCol = direction(position)
 
 	if maze[row][col] == new:
-		maze[row][col]
-		dropCrumb(position,been,maze)
+		maze = dropCrumb(position,been,maze)
 	
 	# if we are retracing and find a new path, we want to be able to
 	# retrace along this new path.
 	elif maze[row][col] == been == maze[newRow][newCol]:
-		dropCrumb(position,retrace,maze)
+		maze = dropCrumb(position,retrace,maze)
 	
 	elif maze[row][col] == been:
-		dropCrumb(position,been,maze)
+		maze = dropCrumb(position,been,maze)
 	
-	return direction(position)
+	return direction(position),maze
 
 #---------------------------------------------------------------------------------
 
@@ -168,23 +169,25 @@ def solve(position, maze, previousDirection=None):
 	Recursive function to solve the maze
 	"""
 	print "".join(maze)
-	
 	row,col = position
 	
-	if maze[row][col] == end:
-		print "done"
+	while maze[row][col] is not end:
 	
-	else:
 		directionIndex, direction = chooseDirection(position,
 							    previousDirection,
 							    maze)
-		if direction != None:
-			previousDirection = directionIndex
-			newPosition = move(position, direction, maze)
-			solve(newPosition, maze, previousDirection)
-		else:
-			print "I've got stuck. Bugger!"
+		if direction == None:
+			break
 
+		previousDirection = directionIndex
+		position, maze = move(position, direction, maze)
+		row,col = position
+		print "".join(maze)
+	
+	if maze[row][col] is end:
+		print "solved!"
+	else:
+		print "I got stuck.. bugger!"
 #---------------------------------------------------------------------------------
 
 def main():
