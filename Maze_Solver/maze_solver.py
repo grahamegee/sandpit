@@ -166,7 +166,7 @@ def priority_move(moves, previousDirection, maze):
 
 def solve(position, maze, previousDirection=None):
 	"""
-	Recursive function to solve the maze
+	top level solve function
 	"""
 	print "".join(maze)
 	row,col = position
