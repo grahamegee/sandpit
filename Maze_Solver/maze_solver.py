@@ -77,40 +77,6 @@ def find_start(maze):
 	for key in maze.keys():
 		if maze[key] == start:
 			return key
-		
-#---------------------------------------------------------------------------------
-
-def dropCrumb(position, crumb, maze):
-	""" substitute character in maze at current position with a crumb 
-	    character
-
-		Inputs:
-		    position (row,collum)
-		    crumb been
-		    maze
-	"""
-	maze[position] = crumb 
-	
-	return maze
-
-#---------------------------------------------------------------------------------
-
-def move(position, direction, maze):
-	""" apply movement from current position in the given direction 
-	    and drop a breadcrumb.
-	    
-	    Inputs:
-		position (row,collumn)
-		direction up|down|left|right
-		maze
-	"""
-	# drop a crumb every time you move over a new position so that subsequent
-	# moves can be prioritised
-	if maze[position] == new:
-		maze = dropCrumb(position,been,maze)
-	
-	
-	return direction(position), maze
 
 #---------------------------------------------------------------------------------
 
@@ -178,7 +144,12 @@ def solve(position, maze, previousDirection=None):
 			break
 
 		previousDirection = directionIndex
-		position, maze = move(position, direction, maze)
+		# if we're moving over a new position drop a crumb so that
+		# subsequent moves can be prioritised
+		if maze[position] == new:
+			maze[position] = been
+		# move
+		position = direction(position)
 		show_maze(maze)
 	
 	if maze[position] is end:
