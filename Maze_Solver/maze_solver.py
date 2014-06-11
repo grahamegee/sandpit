@@ -27,7 +27,9 @@ directions = [right,down,left,up]
 #---------------------------------------------------------------------------------
 
 def parse_maze(mazeFile):
-
+	""" Turn the maze into a dictionary of the form:
+		{(row,col), maze character}
+	"""
 	maze = {}
 	for row in range(len(mazeFile)):
 		for col in range(len(mazeFile[row])):
@@ -38,6 +40,8 @@ def parse_maze(mazeFile):
 #---------------------------------------------------------------------------------
 
 def show_maze(maze):
+	""" Print the maze to standard out
+	"""
 	positions = maze.keys()
 	positions.sort()
 	print "".join([maze[position] for position in positions]) 
@@ -127,7 +131,9 @@ def chooseDirection(position, maze, previousDirection):
 		move = priority_move(moves, previousDirection)
 		if move is not None:
 			return (move, directions[move])
-		else:
+		else:	
+			# less than ideal but this function returns a tuple...
+			# this should never happen.
 			return (None,None)
 
 #---------------------------------------------------------------------------------
@@ -190,7 +196,6 @@ def main():
 	maze = parse_maze(args.file.readlines())
 
 	start = find_start(maze)
-	print start
 	solve(start, maze)
 
 #---------------------------------------------------------------------------------
