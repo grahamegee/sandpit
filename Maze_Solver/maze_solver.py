@@ -8,8 +8,7 @@ import argparse
 
 wall    = '#' 
 new     = ' '
-been    = '.'
-retrace = '!'
+been    = '*'
 start   = 'S'
 end     = 'G'
 edge    = '\n'
@@ -83,7 +82,7 @@ def dropCrumb(position, crumb, maze):
 
 		Inputs:
 		    position (row,collum)
-		    crumb been|retrace
+		    crumb been
 		    maze
 	"""
 	maze[position] = crumb 
@@ -101,20 +100,13 @@ def move(position, direction, maze):
 		direction up|down|left|right
 		maze
 	"""
-	newPosition = direction(position)
-
+	# drop a crumb every time you move over a new position so that subsequent
+	# moves can be prioritised
 	if maze[position] == new:
 		maze = dropCrumb(position,been,maze)
 	
-	# if we are retracing and find a new path, we want to be able to
-	# retrace along this new path.
-	elif maze[position] == been == maze[newPosition]:
-		maze = dropCrumb(position,retrace,maze)
 	
-	elif maze[position] == been:
-		maze = dropCrumb(position,been,maze)
-	
-	return newPosition, maze
+	return direction(position), maze
 
 #---------------------------------------------------------------------------------
 
@@ -126,18 +118,17 @@ def chooseDirection(position, maze, previousDirection):
 	"""
 	moves = [check(movement(position),maze) for movement in directions]
 	
-	# if you can finish do so, otherwise prioritise
+	# if you can finish do so, otherwise keep moving
 
 	if end in moves:
 		return (moves.index(end),directions[moves.index(end)])
 
 	else:
 		move = priority_move(moves, previousDirection)
-		if move != None:
+		if move is not None:
 			return (move, directions[move])
 		else:
-			#less than ideal but this function returns a tuple
-			return (None, None)
+			return (None,None)
 
 #---------------------------------------------------------------------------------
 
@@ -157,8 +148,6 @@ def priority_move(moves, previousDirection):
 
 	elif indexes_for_been != []:	
 		if previousDirection in indexes_for_been:
-		# if you hit a wall and turn around, this will ensure
-		# that you keep moving away from the wall.
 		 	return previousDirection
 		else:
 			return indexes_for_been[0]
