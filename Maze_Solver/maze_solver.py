@@ -10,7 +10,7 @@ wall    = '#'
 new     = ' '
 been    = '.'
 retrace = '!'
-start   = "S"
+start   = 'S'
 end     = 'G'
 edge    = '\n'
 
@@ -27,29 +27,39 @@ directions = [right,down,left,up]
 
 #---------------------------------------------------------------------------------
 
-def check(position,maze):
+def parse_maze(mazeFile):
+
+	maze = {}
+	for row in range(len(mazeFile)):
+		for col in range(len(mazeFile[row])):
+			maze[(row,col)] = mazeFile[row][col]
+	
+	return maze
+
+#---------------------------------------------------------------------------------
+
+def show_maze(maze):
+	positions = maze.keys()
+	positions.sort()
+	print "".join([maze[position] for position in positions]) 
+
+#---------------------------------------------------------------------------------
+
+def check(position, maze):
 	""" Check the position. If it is end/new/been return it, otherwise return
 	    None.
 	"""
-	height = len(maze)
-	width  = len(maze[0])
 		
-	row,col = position
-	# avoid accessing the array from the other side!
-	if row < 0 or col < 0:
-		return None
-	
-	# dont access index out of range
-	if row == height or col == width:
+	if position not in maze.keys():
 		return None	
 	
-	if maze[row][col] == end:
+	if maze[position] == end:
 		return end
 
-	elif maze[row][col] == new:
+	elif maze[position] == new:
 		return new
 
-	elif maze[row][col] == been:
+	elif maze[position] == been:
 		return been
 
 	else:
@@ -60,11 +70,10 @@ def check(position,maze):
 def find_start(maze):
 	""" function to extract the start position from the maze.
 	"""
-	for subArray in range(len(maze)):
-		if start in maze[subArray]:
-			position = (subArray, maze[subArray].index(start))
 	
-	return position
+	for key in maze.keys():
+		if maze[key] == start:
+			return key
 		
 #---------------------------------------------------------------------------------
 
@@ -77,10 +86,7 @@ def dropCrumb(position, crumb, maze):
 		    crumb been|retrace
 		    maze
 	"""
-	row,col = position
-	
-	# strings are immutable so do some slicing
-	maze[row] = maze[row][:col] + crumb + maze[row][col+1:]
+	maze[position] = crumb 
 	
 	return maze
 
@@ -95,25 +101,24 @@ def move(position, direction, maze):
 		direction up|down|left|right
 		maze
 	"""
-	row,col = position
-	newRow,newCol = direction(position)
+	newPosition = direction(position)
 
-	if maze[row][col] == new:
+	if maze[position] == new:
 		maze = dropCrumb(position,been,maze)
 	
 	# if we are retracing and find a new path, we want to be able to
 	# retrace along this new path.
-	elif maze[row][col] == been == maze[newRow][newCol]:
+	elif maze[position] == been == maze[newPosition]:
 		maze = dropCrumb(position,retrace,maze)
 	
-	elif maze[row][col] == been:
+	elif maze[position] == been:
 		maze = dropCrumb(position,been,maze)
 	
-	return direction(position),maze
+	return newPosition, maze
 
 #---------------------------------------------------------------------------------
 
-def chooseDirection(position, previousDirection, maze):
+def chooseDirection(position, maze, previousDirection):
 	""" choose the best direction to move in from current position.
 			
 		Uses:
@@ -127,7 +132,7 @@ def chooseDirection(position, previousDirection, maze):
 		return (moves.index(end),directions[moves.index(end)])
 
 	else:
-		move = priority_move(moves, previousDirection, maze)
+		move = priority_move(moves, previousDirection)
 		if move != None:
 			return (move, directions[move])
 		else:
@@ -136,7 +141,7 @@ def chooseDirection(position, previousDirection, maze):
 
 #---------------------------------------------------------------------------------
 
-def priority_move(moves, previousDirection, maze):
+def priority_move(moves, previousDirection):
 	""" chooses highest priority direction to move in if there is a choice.
 	"""
 	#1) a new square takes priority over a square you have already been on
@@ -168,23 +173,20 @@ def solve(position, maze, previousDirection=None):
 	"""
 	top level solve function
 	"""
-	print "".join(maze)
-	row,col = position
 	
-	while maze[row][col] is not end:
+	while maze[position] is not end:
 	
 		directionIndex, direction = chooseDirection(position,
-							    previousDirection,
-							    maze)
+							    maze,
+							    previousDirection)
 		if direction == None:
 			break
 
 		previousDirection = directionIndex
 		position, maze = move(position, direction, maze)
-		row,col = position
-		print "".join(maze)
+		show_maze(maze)
 	
-	if maze[row][col] is end:
+	if maze[position] is end:
 		print "solved!"
 	else:
 		print "I got stuck.. bugger!"
@@ -196,9 +198,10 @@ def main():
 	parser.add_argument('file', type=file)
 
 	args = parser.parse_args()
-	maze =  args.file.readlines()
-	
+	maze = parse_maze(args.file.readlines())
+
 	start = find_start(maze)
+	print start
 	solve(start, maze)
 
 #---------------------------------------------------------------------------------
