@@ -4,15 +4,39 @@ import argparse
 
 route   = '.' 
 new     = ' '
-been    = '*'
+deadend = '*'
 start   = 'S'
 end     = 'G'
 edge    = '\n'
 
-up    = lambda (row,col): (row-1,col)	
-down  = lambda (row,col): (row+1,col)
-right = lambda (row,col): (row,col+1)
-left  = lambda (row,col): (row,col-1)
+#----------------------------------------------------------------------------------
+
+# use these to be verbose
+def up(position):
+	print "moving up"
+ 	row,col = position
+	return (row-1,col)
+
+def down(position):
+	print "moving down"
+ 	row,col = position
+	return (row+1,col)
+
+
+def left(position):
+	print "moving left"
+ 	row,col = position
+	return (row,col-1)
+
+def right(position):
+	print "moving right"
+ 	row,col = position
+	return (row,col+1)
+
+#up    = lambda (row,col): (row-1,col)	
+#down  = lambda (row,col): (row+1,col)
+#right = lambda (row,col): (row,col+1)
+#left  = lambda (row,col): (row,col-1)
 
 #----------------------------------------------------------------------------------
 
@@ -47,27 +71,58 @@ def show_maze(maze):
 
 #----------------------------------------------------------------------------------
 
+def mark_position(position, marker, maze):
+	""" Mark the position in the maze with a marker type
+		Inputs:
+			position (row,col)
+			marker route|deadend
+			maze
+	"""
+	if maze[position] is not start:
+		maze[position] = marker
+		if marker == route:
+			print "Mark as explored route point"
+		else:
+			print "Mark as deadend"
+	else:
+		print "At the start"
+
+	return maze
+
+#----------------------------------------------------------------------------------
+
 def solve(position, maze):
+	print "current postion (%d,%d)" % position
 	
+	print "Is position in maze?"	
 	if position not in maze.keys():
-		print "invalid position"
+		print "No"
 		return False
+	print "Yes"
+
+	print "Is position the goal?"
 	if maze[position] is end:
-		print "solved!"
+		print "Yes"
 		show_maze(maze)
 		return True
+	print "No"
+
+	print "Is position unexplored and on the path?"
 	if maze[position] not in [new,start]:
-		print "not a new path position"
+		print "No"
 		return False
-	print "mark as been"
-	maze[position] = been
+	print "Yes"
+	
+	maze = mark_position(position, route, maze)
 	show_maze(maze)
-	if solve(up(position), maze) or solve(down(position), maze) \
-	or solve(left(position), maze) or solve(right(position), maze):
-	#	print "fill in route"
-	#	maze[position] = route
-	#	show_maze(maze)
+
+	if solve(right(position), maze) or solve(down(position), maze) \
+	or solve(left(position), maze) or solve(up(position), maze):
 		return True
+
+	print "backtracking ...."	
+	maze = mark_position(position, deadend, maze)
+	show_maze(maze)
 	return False
 	 
 	
