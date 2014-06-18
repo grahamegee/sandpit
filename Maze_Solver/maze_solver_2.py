@@ -44,7 +44,8 @@ def find_start(maze):
 def show_maze(maze):
 	""" Print the maze to standard out
 	"""
-	positions = maze.keys().sort()
+	positions = maze.keys()
+	positions.sort()
 	print "".join([maze[position] for position in positions]) 
 
 #----------------------------------------------------------------------------------

@@ -56,15 +56,8 @@ def check(position, maze):
 	if position not in maze.keys():
 		return None	
 	
-	if maze[position] == end:
-		return end
-
-	elif maze[position] == new:
-		return new
-
-	elif maze[position] == been:
-		return been
-
+	if maze[position] in [end,new,been]:
+		return maze[position]
 	else:
 		return None	
 
@@ -73,10 +66,7 @@ def check(position, maze):
 def find_start(maze):
 	""" function to extract the start position from the maze.
 	"""
-	
-	for key in maze.keys():
-		if maze[key] == start:
-			return key
+	return [key for key, val in maze.items() if val == start][0]
 
 #---------------------------------------------------------------------------------
 
@@ -91,16 +81,15 @@ def chooseDirection(position, maze, previousDirection):
 	# if you can finish do so, otherwise keep moving
 
 	if end in moves:
-		return (moves.index(end),directions[moves.index(end)])
+		return directions[moves.index(end)]
 
 	else:
 		move = priority_move(moves, previousDirection)
 		if move is not None:
-			return (move, directions[move])
+			return move
 		else:	
-			# less than ideal but this function returns a tuple...
 			# this should never happen.
-			return (None,None)
+			return None
 
 #---------------------------------------------------------------------------------
 
@@ -109,20 +98,20 @@ def priority_move(moves, previousDirection):
 	"""
 	#1) a new square takes priority over a square you have already been on
 	#2) keep going in the same direction if you can.
-	indexes_for_new  = [x for x in range(len(moves)) if moves[x] == new]
-	indexes_for_been = [x for x in range(len(moves)) if moves[x] == been]
+	new_directions  = [directions[x] for x in range(len(moves)) if moves[x] == new]
+	been_directions = [directions[x] for x in range(len(moves)) if moves[x] == been]
 	
-	if indexes_for_new != []:
-		if previousDirection in indexes_for_new:
+	if new_directions != []:
+		if previousDirection in new_directions:
 			return previousDirection
 		else:
-			return indexes_for_new[0]
+			return new_directions[0]
 
-	elif indexes_for_been != []:	
-		if previousDirection in indexes_for_been:
+	elif been_directions != []:	
+		if previousDirection in been_directions:
 		 	return previousDirection
 		else:
-			return indexes_for_been[0]
+			return been_directions[0]
 	
 	else:
 		#this should never happen...
@@ -137,13 +126,11 @@ def solve(position, maze, previousDirection=None):
 	
 	while maze[position] is not end:
 	
-		directionIndex, direction = chooseDirection(position,
-							    maze,
-							    previousDirection)
+		direction = chooseDirection(position, maze, previousDirection)
 		if direction == None:
 			break
 
-		previousDirection = directionIndex
+		previousDirection = direction
 		# if we're moving over a new position drop a crumb so that
 		# subsequent moves can be prioritised
 		if maze[position] == new:
@@ -155,7 +142,7 @@ def solve(position, maze, previousDirection=None):
 	if maze[position] is end:
 		print "solved!"
 	else:
-		print "I got stuck.. bugger!"
+		print "I got stuck..."
 #---------------------------------------------------------------------------------
 
 def main():
@@ -165,9 +152,7 @@ def main():
 
 	args = parser.parse_args()
 	maze = parse_maze(args.file.readlines())
-
-	start = find_start(maze)
-	solve(start, maze)
+	solve(find_start(maze), maze)
 
 #---------------------------------------------------------------------------------
 
