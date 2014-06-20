@@ -1,34 +1,23 @@
 # find the largest prime factor of the given integer.
 
-number = 600851475143
-#number = 300
+#number = 600851475143
+number = 450
 
 def find_prime_factors(n):
 	primes  = []
-	integers = [n]
+	integer = n
 	devisor = 2
-	while reduce(lambda x,y: x*y, primes + integers) == n:
+	while integer > 1:
+		assert reduce(lambda x,y: x*y, primes + [integer]) == n
 
-		while integers != [] and integers[0] % devisor == 0:
-			
-			if integers[0] == devisor:
-				primes.append(integers[0])
-				integers = integers[1:]
-			else:
-				integers.append(devisor)
-				integers.append(integers[0]/devisor)
-				integers = integers[1:]
-		
-		if integers == []:
-			return primes
+		while integer % devisor == 0:
+				primes.append(devisor)
+				integer /= devisor
 		
 		devisor += 1
-	else:
-		return None
+		
+	return primes
 
 primefactors = find_prime_factors(number)
-
-if primefactors is not None:
-	print "largest prime factor of %d is %d" %(number, primefactors[-1])
-else:
-	print "something went wrong"
+print primefactors
+print "largest prime factor of %d is %d" %(number, primefactors[-1])
