@@ -1,13 +1,14 @@
 # find the largest prime factor of the given integer.
 
-#number = 600851475143
-number = 450
+number = 600851475143
+#number = 450
 
 def find_prime_factors(n):
 	primes  = []
 	integer = n
 	devisor = 2
 	while integer > 1:
+		#python -O to disable invariant check
 		assert reduce(lambda x,y: x*y, primes + [integer]) == n
 
 		while integer % devisor == 0:
