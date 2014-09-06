@@ -6,16 +6,16 @@ number = 600851475143
 def find_prime_factors(n):
 	primes  = []
 	integer = n
-	devisor = 2
+	divisor = 2
 	while integer > 1:
 		#python -O to disable invariant check
 		assert reduce(lambda x,y: x*y, primes + [integer]) == n
 
-		while integer % devisor == 0:
-				primes.append(devisor)
-				integer /= devisor
+		while integer % divisor == 0:
+				primes.append(divisor)
+				integer /= divisor
 		
-		devisor += 1
+		divisor += 1
 		
 	return primes
 
